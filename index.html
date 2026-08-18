@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sem Mouse, Sem Barreira — Squad 2 · Perfil Motor</title>
+<meta name="description" content="Projeto de acessibilidade web focado em navegação sem mouse: focus trap, controle de foco via teclado e tecla Escape.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Skip link: primeiro recurso de acessibilidade que o usuário de teclado encontra -->
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo principal</a>
+
+  <header class="topbar">
+    <div class="wrap topbar__inner">
+      <span class="brand">
+        <span class="brand__key" aria-hidden="true">⇥</span>
+        Squad 2 <span class="brand__sub">/ Perfil Motor</span>
+      </span>
+      <nav class="topnav" aria-label="Navegação principal">
+        <a href="#problema">O problema</a>
+        <a href="#solucao">A solução</a>
+        <a href="#demo">Demo</a>
+        <a href="#requisitos">Requisitos técnicos</a>
+        <a href="#testar">Como testar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="conteudo">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="wrap hero__inner">
+        <div class="hero__text">
+          <p class="eyebrow">Acessibilidade situacional e permanente · Navegação sem mouse</p>
+          <h1>
+            Seu mouse quebrou.<br>
+            <span class="hero__accent">A interface ainda precisa te obedecer.</span>
+          </h1>
+          <p class="hero__lead">
+            Para quem navega só com o teclado — por deficiência motora, lesão temporária ou porque o
+            mouse simplesmente parou de funcionar — cada <kbd class="key">Tab</kbd> é um passo.
+            Se um componente prende o foco ou o esconde, a pessoa fica presa dentro da própria página.
+            Este projeto mostra como resolver isso de verdade.
+          </p>
+          <div class="hero__cta">
+            <a href="#demo" class="btn btn--primary">Ver demonstração ao vivo</a>
+            <a href="#requisitos" class="btn btn--ghost">Ver requisitos técnicos</a>
+          </div>
+        </div>
+
+        <div class="hero__stage" aria-hidden="true">
+          <p class="hero__stage-label">assim a Tab percorre a interface</p>
+          <div class="keystrip">
+            <span class="keycap">Tab</span>
+            <span class="keycap">Tab</span>
+            <span class="keycap keycap--mini">⇧ Tab</span>
+            <span class="keycap keycap--accent">Enter</span>
+            <span class="keycap keycap--esc">Esc</span>
+            <span class="focus-runner"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTEXTO: os 4 perfis (resumo) -->
+    <section class="section section--tight" id="contexto">
+      <div class="wrap">
+        <h2 class="section__title">Por que foco de teclado importa</h2>
+        <p class="section__intro">
+          A acessibilidade web atende quatro perfis centrais. Este squad assume a responsabilidade pelo segundo:
+          garantir que ninguém dependa de um mouse para operar a interface.
+        </p>
+        <div class="profile-grid">
+          <div class="profile-card">
+            <span class="profile-card__num">01</span>
+            <h3>Leitores de tela</h3>
+            <p>NVDA, JAWS, VoiceOver — dependem de <code>aria-expanded</code> e <code>aria-controls</code> para descrever o que está acontecendo.</p>
+          </div>
+          <div class="profile-card profile-card--active">
+            <span class="profile-card__num">02</span>
+            <h3>Navegação por teclado</h3>
+            <p>Foco em <code>.focus()</code>, focus trap e suporte a <kbd>Tab</kbd> / <kbd>Esc</kbd>. É o perfil deste projeto.</p>
+          </div>
+          <div class="profile-card">
+            <span class="profile-card__num">03</span>
+            <h3>Cognição e atenção</h3>
+            <p>TDAH, autismo, dislexia — comportamento previsível (como fechar com <kbd>Esc</kbd>) reduz carga mental.</p>
+          </div>
+          <div class="profile-card">
+            <span class="profile-card__num">04</span>
+            <h3>Situacional</h3>
+            <p>Braço engessado, mouse quebrado, sol forte na tela. Sem deficiência permanente, mesma barreira.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROBLEMA -->
+    <section class="section" id="problema">
+      <div class="wrap two-col">
+        <div>
+          <p class="eyebrow">O problema</p>
+          <h2 class="section__title">Um componente sem controle de foco é uma armadilha</h2>
+          <p>
+            Quando um modal, menu lateral ou carrossel aparece na tela e o JavaScript não move o foco para
+            dentro dele, o usuário de teclado continua tabulando pelo conteúdo <em>atrás</em> do componente —
+            invisível, mas ainda focável. Ele erra o alvo, se perde, e em muitos casos nem sabe que o
+            componente foi aberto.
+          </p>
+          <p>
+            Pior: se o foco escapa para fora de um modal ativo, a pessoa pode acionar botões que estão
+            escondidos atrás dele sem perceber. E sem uma tecla de saída rápida como <kbd>Esc</kbd>, cancelar
+            a ação vira um teste de paciência.
+          </p>
+        </div>
+        <ul class="problem-list" role="list">
+          <li>
+            <span class="problem-list__icon" aria-hidden="true">✕</span>
+            Foco continua "atrás" do componente aberto
+          </li>
+          <li>
+            <span class="problem-list__icon" aria-hidden="true">✕</span>
+            Tab leva a pessoa para fora da tela, sem retorno
+          </li>
+          <li>
+            <span class="problem-list__icon" aria-hidden="true">✕</span>
+            Nenhuma forma de cancelar sem usar o mouse
+          </li>
+          <li>
+            <span class="problem-list__icon" aria-hidden="true">✕</span>
+            Ao fechar, o foco se perde no topo da página
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- SOLUÇÃO -->
+    <section class="section section--alt" id="solucao">
+      <div class="wrap">
+        <p class="eyebrow">A solução</p>
+        <h2 class="section__title">Três comportamentos, implementados de verdade</h2>
+        <div class="solution-grid">
+          <article class="solution-card">
+            <span class="solution-card__kbd" aria-hidden="true">.focus()</span>
+            <h3>Foco direcionado</h3>
+            <p>Ao abrir o componente, o JavaScript move o foco imediatamente para o primeiro elemento
+              interativo dentro dele — nunca deixa o usuário "solto".</p>
+          </article>
+          <article class="solution-card">
+            <span class="solution-card__kbd" aria-hidden="true">⇥ ⇄</span>
+            <h3>Focus trap</h3>
+            <p>Enquanto o componente está ativo, <kbd>Tab</kbd> e <kbd>Shift+Tab</kbd> circulam apenas entre
+              os elementos internos. O resto da página fica temporariamente fora do percurso.</p>
+          </article>
+          <article class="solution-card">
+            <span class="solution-card__kbd" aria-hidden="true">Esc</span>
+            <h3>Saída garantida</h3>
+            <p>Pressionar <kbd>Esc</kbd> fecha o componente a qualquer momento e devolve o foco exatamente
+              para o botão que o abriu.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEMO -->
+    <section class="section" id="demo">
+      <div class="wrap">
+        <p class="eyebrow">Demonstração ao vivo</p>
+        <h2 class="section__title">Teste com o mouse guardado na gaveta</h2>
+        <p class="section__intro">
+          Os dois componentes abaixo são 100% funcionais. Experimente operá-los apenas com o teclado —
+          instruções detalhadas na seção <a href="#testar">Como testar</a>.
+        </p>
+
+        <div class="demo-grid">
+
+          <!-- DEMO 1: MODAL -->
+          <div class="demo-card">
+            <h3>1. Modal de confirmação</h3>
+            <p>Um diálogo que exige atenção do usuário antes de continuar — clássico caso de focus trap.</p>
+            <button type="button" id="abrirModal" class="btn btn--primary">
+              Excluir conta de teste
+            </button>
+          </div>
+
+          <!-- DEMO 2: MENU LATERAL -->
+          <div class="demo-card">
+            <h3>2. Menu lateral expansível</h3>
+            <p>Um painel de navegação que desliza pela lateral, também com foco preso enquanto aberto.</p>
+            <button type="button" id="abrirMenu" class="btn btn--ghost" aria-expanded="false" aria-controls="menuLateral">
+              Abrir menu lateral
+            </button>
+          </div>
+
+        </div>
+
+        <p class="live-status" id="liveStatus" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <!-- REQUISITOS TÉCNICOS -->
+    <section class="section section--alt" id="requisitos">
+      <div class="wrap">
+        <p class="eyebrow">Checklist</p>
+        <h2 class="section__title">Requisitos técnicos atendidos</h2>
+        <table class="req-table">
+          <thead>
+            <tr>
+              <th scope="col">Requisito</th>
+              <th scope="col">Onde está</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Controlar o foco via <code>.focus()</code></td>
+              <td><code>js/script.js</code> → <code>abrirComponente()</code></td>
+              <td><span class="badge badge--ok">Feito</span></td>
+            </tr>
+            <tr>
+              <td>Focus trap (foco não escapa do componente)</td>
+              <td><code>js/script.js</code> → <code>aprisionarFoco()</code></td>
+              <td><span class="badge badge--ok">Feito</span></td>
+            </tr>
+            <tr>
+              <td>Fechar/cancelar com <kbd>Esc</kbd></td>
+              <td><code>js/script.js</code> → listener <code>keydown</code></td>
+              <td><span class="badge badge--ok">Feito</span></td>
+            </tr>
+            <tr>
+              <td>Foco retorna ao elemento que abriu o componente</td>
+              <td><code>js/script.js</code> → <code>fecharComponente()</code></td>
+              <td><span class="badge badge--ok">Feito</span></td>
+            </tr>
+            <tr>
+              <td><code>aria-expanded</code> / <code>aria-controls</code></td>
+              <td><code>index.html</code> → botões de gatilho</td>
+              <td><span class="badge badge--ok">Feito</span></td>
+            </tr>
+            <tr>
+              <td>Indicador de foco visível (<code>:focus-visible</code>)</td>
+              <td><code>css/style.css</code></td>
+              <td><span class="badge badge--ok">Feito</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- COMO TESTAR -->
+    <section class="section" id="testar">
+      <div class="wrap">
+        <p class="eyebrow">Como testar</p>
+        <h2 class="section__title">Roteiro de teste sem mouse</h2>
+        <ol class="steps">
+          <li>
+            <span class="steps__key">1</span>
+            <div>
+              <h3>Guarde o mouse</h3>
+              <p>Literalmente. Use apenas <kbd class="key">Tab</kbd>, <kbd class="key">Shift</kbd> +
+                <kbd class="key">Tab</kbd>, <kbd class="key">Enter</kbd> / <kbd class="key">Espaço</kbd> e
+                <kbd class="key">Esc</kbd>.</p>
+            </div>
+          </li>
+          <li>
+            <span class="steps__key">2</span>
+            <div>
+              <h3>Chegue até o botão da demo</h3>
+              <p>Use <kbd class="key">Tab</kbd> a partir do topo da página até focar em
+                "Excluir conta de teste" e pressione <kbd class="key">Enter</kbd>.</p>
+            </div>
+          </li>
+          <li>
+            <span class="steps__key">3</span>
+            <div>
+              <h3>Tente escapar do modal</h3>
+              <p>Continue pressionando <kbd class="key">Tab</kbd> várias vezes. Note que o foco nunca sai
+                do modal — ele circula entre os botões internos.</p>
+            </div>
+          </li>
+          <li>
+            <span class="steps__key">4</span>
+            <div>
+              <h3>Cancele com Esc</h3>
+              <p>Pressione <kbd class="key">Esc</kbd>. O modal fecha e o foco volta exatamente para o botão
+                que você usou para abri-lo.</p>
+            </div>
+          </li>
+          <li>
+            <span class="steps__key">5</span>
+            <div>
+              <h3>Repita no menu lateral</h3>
+              <p>Faça o mesmo percurso no botão "Abrir menu lateral" e confira o <code>aria-expanded</code>
+                mudando de <code>false</code> para <code>true</code> nas ferramentas de desenvolvedor.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <div>
+        <span class="brand brand--footer">
+          <span class="brand__key" aria-hidden="true">⇥</span>
+          Squad 2 / Perfil Motor
+        </span>
+        <p class="footer__desc">Projeto de estudo em acessibilidade web (WCAG) — navegação sem mouse.</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ======================= MODAL DE CONFIRMAÇÃO ======================= -->
+  <div class="overlay" id="overlayModal" hidden>
+    <div
+      class="modal"
+      id="modalConfirm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitulo"
+      aria-describedby="modalDesc"
+    >
+      <span class="modal__icon" aria-hidden="true">⚠</span>
+      <h2 id="modalTitulo">Excluir conta de teste?</h2>
+      <p id="modalDesc">
+        Esta ação não pode ser desfeita. Todos os dados associados a esta conta de demonstração
+        serão removidos permanentemente.
+      </p>
+      <div class="modal__actions">
+        <button type="button" class="btn btn--ghost" id="cancelarModal">Cancelar</button>
+        <button type="button" class="btn btn--danger" id="confirmarModal">Sim, excluir</button>
+      </div>
+      <p class="modal__hint"><kbd class="key key--sm">Esc</kbd> cancela a qualquer momento</p>
+    </div>
+  </div>
+
+  <!-- ======================= MENU LATERAL EXPANSÍVEL ======================= -->
+  <div class="overlay overlay--menu" id="overlayMenu" hidden>
+    <nav
+      class="side-menu"
+      id="menuLateral"
+      aria-label="Menu de navegação lateral"
+    >
+      <div class="side-menu__head">
+        <span>Menu</span>
+        <button type="button" class="icon-btn" id="fecharMenu" aria-label="Fechar menu">✕</button>
+      </div>
+      <ul>
+        <li><a href="#problema" class="side-menu__link">O problema</a></li>
+        <li><a href="#solucao" class="side-menu__link">A solução</a></li>
+        <li><a href="#demo" class="side-menu__link">Demonstração</a></li>
+        <li><a href="#requisitos" class="side-menu__link">Requisitos técnicos</a></li>
+        <li><a href="#testar" class="side-menu__link">Como testar</a></li>
+      </ul>
+      <p class="side-menu__hint"><kbd class="key key--sm">Esc</kbd> fecha o menu</p>
+    </nav>
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
